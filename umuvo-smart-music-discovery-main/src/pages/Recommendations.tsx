@@ -5,22 +5,39 @@ import { Button } from "@/components/ui/button";
 import { songs, Song } from "@/data/musicData";
 import { X, Heart, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+//import LikedSongs from "./LikedSongs";
 
 const Recommendations = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [currentSongIndex, setCurrentSongIndex] = useState(0);
-  const [recommendedSongs, setRecommendedSongs] = useState<Song[]>([]);
+  const [recommendedSongs, setRecommendedSongs] = useState<any[]>([]);
 
   useEffect(() => {
     // Filter songs based on user preferences
-    const filtered = songs.filter((song) =>
-      user?.preferences.includes(song.genre)
-    );
-    setRecommendedSongs(filtered.length > 0 ? filtered : songs);
+    const likedSongs = JSON.parse(localStorage.getItem("likedSongs"))
+    getTracks(likedSongs ? "recommended" : "popular",likedSongs)
   }, [user]);
 
   const currentSong = recommendedSongs[currentSongIndex];
+
+  const getTracks = async (t:string,likedSongs) => {
+    var type = t
+    if (!(type == "popular" || type == "recommended")) type = 'popular' 
+
+    const params = new URLSearchParams();
+
+    likedSongs.forEach(t => params.append("liked", t.id));
+
+    const response = await fetch(`http://127.0.0.1:8000/${type}-tracks/20?${params.toString()}`,{
+      method: 'GET', // O método GET é o padrão, mas é bom ser explícito.
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = response.json()
+    setRecommendedSongs(await data)
+  }
 
   const handleDislike = () => {
     if (currentSongIndex < recommendedSongs.length - 1) {

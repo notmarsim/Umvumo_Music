@@ -85,7 +85,7 @@ for i in range(2):
 
     best_acc = 0.0
     best_model = None
-
+    best_preds = None
     for h in hidden_neurons:
         for lr in learning_rates:
             for act in activations:
@@ -105,6 +105,7 @@ for i in range(2):
                 if acc > best_acc:
                     best_acc = acc
                     best_model = rna
+                    best_preds = (h,lr,act)
 
     preds_test = best_model.predict(test_input)
     acc_test = accuracy_score(test_target, preds_test)
@@ -131,3 +132,5 @@ print(top_musicas[['name', 'artists', 'genres', 'like_prob']].head(10))
 
 # (Opcional) Salvar em CSV para analisar depois
 top_musicas.to_csv('csv/music_predictions.csv', index=False)
+
+print(f'\n\n {best_preds}')
