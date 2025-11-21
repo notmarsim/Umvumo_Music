@@ -24,7 +24,7 @@ class SpotifyController:
         if r.status_code != 200:
             print("ERRO NO REQUEST")
             print("Status:", r.status_code)
-            print("Resposta:", r.text)
+            print("Resposta:", r)
             print(r.headers)
             return None
         

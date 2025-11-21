@@ -16,30 +16,56 @@ const Recommendations = () => {
   useEffect(() => {
     // Filter songs based on user preferences
     const likedSongs = JSON.parse(localStorage.getItem("likedSongs"))
-    getTracks(likedSongs ? "recommended" : "popular",likedSongs)
+    const dislikedSongs = JSON.parse(localStorage.getItem("dislikedSongs"))
+    getTracks(likedSongs ? "recommended" : "popular",likedSongs,dislikedSongs)
   }, [user]);
 
   const currentSong = recommendedSongs[currentSongIndex];
 
-  const getTracks = async (t:string,likedSongs) => {
+  const getTracks = async (t:string,likedSongs,dislikedSongs) => {
+    
     var type = t
+
     if (!(type == "popular" || type == "recommended")) type = 'popular' 
+    console.log(type)
+    if (type == 'recommended'){
+      const params = new URLSearchParams();
+      console.log(likedSongs)
+      console.log(dislikedSongs)
+      likedSongs.forEach(t => params.append("liked", t.id));
+      dislikedSongs.forEach(t => params.append("disliked", t.id))
 
-    const params = new URLSearchParams();
-
-    likedSongs.forEach(t => params.append("liked", t.id));
-
-    const response = await fetch(`http://127.0.0.1:8000/${type}-tracks/20?${params.toString()}`,{
-      method: 'GET', // O método GET é o padrão, mas é bom ser explícito.
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    const data = response.json()
-    setRecommendedSongs(await data)
+      const response = await fetch(`http://127.0.0.1:8000/${type}-tracks/20?${params.toString()}`,{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      const data = response.json()
+      setRecommendedSongs(await data)
+    } else {
+      setRecommendedSongs(songs)
+    }
+    
   }
 
   const handleDislike = () => {
+    const dislikedSongs = JSON.parse(localStorage.getItem("dislikedSongs") || "[]");
+    if (!dislikedSongs.find((s: Song) => s.id === currentSong.id)) {
+      localStorage.setItem("dislikedSongs", JSON.stringify([...dislikedSongs, currentSong]));
+      toast.success(`"${currentSong.title}" adicionada às descurtidas!`);
+    } 
+    
+    // checar se está nas curtidas
+    var item = null
+    const likedSongs = JSON.parse(localStorage.getItem("likedSongs") || "[]");
+    if ((item = likedSongs.find((s: Song) => s.id === currentSong.id))) {
+      likedSongs.splice(likedSongs.indexOf(item))
+      localStorage.setItem("likedSongs", JSON.stringify(likedSongs));
+      toast.success(`"${currentSong.title}" removida das curtidas!`);
+    }
+
+    
     if (currentSongIndex < recommendedSongs.length - 1) {
       setCurrentSongIndex(currentSongIndex + 1);
     } else {
@@ -53,6 +79,15 @@ const Recommendations = () => {
     if (!likedSongs.find((s: Song) => s.id === currentSong.id)) {
       localStorage.setItem("likedSongs", JSON.stringify([...likedSongs, currentSong]));
       toast.success(`"${currentSong.title}" adicionada às curtidas!`);
+    }
+
+    // checar se está nas descurtidas
+    var item = null
+    const dislikedSongs = JSON.parse(localStorage.getItem("dislikedSongs") || "[]");
+    if ((item = dislikedSongs.find((s: Song) => s.id === currentSong.id))) {
+      dislikedSongs.splice(dislikedSongs.indexOf(item))
+      localStorage.setItem("dislikedSongs", JSON.stringify(dislikedSongs));
+      toast.success(`"${currentSong.title}" removida das descurtidas!`);
     }
     
     if (currentSongIndex < recommendedSongs.length - 1) {

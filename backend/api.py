@@ -25,9 +25,11 @@ app.add_middleware(
 spotify = SpotifyController()
 mlp = MLP()
 
-def formatTracks(df):
+def formatTracks(df: pd.DataFrame):
     df['artist'] = df['artists'].apply(lambda x: ast.literal_eval(x)[0])
+
     df['coverUrl'] = spotify.getCovers(','.join(df['id'].to_list()))
+    
     df['title'] = df['name']
     df = df[['id','title','artist','coverUrl']]
     return df
@@ -45,10 +47,12 @@ def getTracks(amount:int):
     return tracks
 
 @app.get('/recommended-tracks/{amount}')
-async def getRecommendedTracks(amount:int,liked:List[str] = Query(...)): # MLP
-    print(liked)
-    df = mlp.run(liked).sort_values(by='like_prob',ascending=False).iloc[0:amount]
+async def getRecommendedTracks(amount:int,liked:List[str] = Query(...),disliked:List[str] = Query(...)): # MLP
+    print('LIKED:',liked)
+    print('DISLIKED:',disliked)
+    df = mlp.run(liked,disliked)[0:amount]
     df = formatTracks(df)
+    
     df.index = list(range(amount))
     tracks = [df.iloc[i].to_dict() for i in range(amount)]
     return tracks

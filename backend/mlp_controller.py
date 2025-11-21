@@ -20,7 +20,7 @@ class MLP:
 
         features = [
             'valence', 'acousticness', 'danceability', 'duration_ms', 'energy',
-            'instrumentalness', 'liveness', 'loudness', 'speechiness'
+            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity'
         ]
         data = self.tracks_full[features]
 
@@ -31,15 +31,16 @@ class MLP:
 
         return tracks
 
-    def run(self,liked):
-        self.train(liked)
-        return self.predict()
+    def run(self,liked,disliked):
+        self.train(liked,disliked)
+        return self.predict(liked)
 
-    def train(self,liked):
+    def train(self,liked,disliked):
 
         tracks_likes = self.tracks.copy()
-        tracks_likes['like'] = self.tracks_full['id'].isin(liked).astype(int)
-
+        tracks_likes['like'] = self.tracks_full['id'].isin(liked).astype(int) - 5*self.tracks_full['id'].isin(disliked).astype(int)
+        
+        
         train_ratio = 0.6
         valid_ratio = 0.2
 
@@ -69,9 +70,9 @@ class MLP:
         self.rna = rna
         
     
-    def predict(self):
+    def predict(self,liked):
         probs = self.rna.predict_proba(self.tracks)[:, 1]
         tracks_copy = self.tracks_full.copy()
         tracks_copy['like_prob'] = probs
-        recommended_tracks = tracks_copy.sort_values('like_prob', ascending=False)
+        recommended_tracks = tracks_copy.sort_values('like_prob', ascending=False)[~tracks_copy['id'].isin(liked)]
         return recommended_tracks

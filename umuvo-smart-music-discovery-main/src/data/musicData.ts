@@ -33,7 +33,7 @@ async function getPopTracks(){
   return r.json()
 }
 
-export const songs: Song[] = await getPopTracks() // default tracks
+export const songs: Song[] = [] // await getPopTracks() // default tracks
 
 
 
