@@ -52,7 +52,6 @@ async def getRecommendedTracks(amount:int,liked:List[str] = Query(...),disliked:
     print('DISLIKED:',disliked)
     df = mlp.run(liked,disliked)[0:amount]
     df = formatTracks(df)
-    
     df.index = list(range(amount))
     tracks = [df.iloc[i].to_dict() for i in range(amount)]
     return tracks

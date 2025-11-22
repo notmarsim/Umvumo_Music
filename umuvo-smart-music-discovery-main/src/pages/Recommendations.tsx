@@ -17,35 +17,37 @@ const Recommendations = () => {
     // Filter songs based on user preferences
     const likedSongs = JSON.parse(localStorage.getItem("likedSongs"))
     const dislikedSongs = JSON.parse(localStorage.getItem("dislikedSongs"))
-    getTracks(likedSongs ? "recommended" : "popular",likedSongs,dislikedSongs)
+    getTracks(likedSongs,dislikedSongs)
   }, [user]);
 
   const currentSong = recommendedSongs[currentSongIndex];
 
-  const getTracks = async (t:string,likedSongs,dislikedSongs) => {
+  const getTracks = async (likedSongs,dislikedSongs) => {
     
-    var type = t
+    var type = 'popular'
+    if (likedSongs || dislikedSongs) type = 'recommended'
 
-    if (!(type == "popular" || type == "recommended")) type = 'popular' 
     console.log(type)
+
+    var request = `http://127.0.0.1:8000/popular-tracks/20`
+
     if (type == 'recommended'){
       const params = new URLSearchParams();
       console.log(likedSongs)
       console.log(dislikedSongs)
       likedSongs.forEach(t => params.append("liked", t.id));
       dislikedSongs.forEach(t => params.append("disliked", t.id))
-
-      const response = await fetch(`http://127.0.0.1:8000/${type}-tracks/20?${params.toString()}`,{
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      const data = response.json()
-      setRecommendedSongs(await data)
-    } else {
-      setRecommendedSongs(songs)
+      request = `http://127.0.0.1:8000/recommended-tracks/20?${params.toString()}`
     }
+
+    const response = await fetch(request,{
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+    const data = response.json()
+    setRecommendedSongs(await data)
     
   }
 

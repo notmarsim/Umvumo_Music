@@ -12,7 +12,7 @@ class MLP:
         self.hidden_neurons = 40
         self.learning_rates = 0.001
         self.activation = 'tanh'
-        self.tracks_full = pd.read_csv("csv/data_with_genres.csv")
+        self.tracks_full = pd.read_csv("csv/data_with_genres_id.csv")
         self.tracks = self.setTracks()
         
 
@@ -20,7 +20,7 @@ class MLP:
 
         features = [
             'valence', 'acousticness', 'danceability', 'duration_ms', 'energy',
-            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity'
+            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity', 'id_genre'
         ]
         data = self.tracks_full[features]
 
@@ -37,7 +37,7 @@ class MLP:
 
     def train(self,liked,disliked):
 
-        tracks_likes = self.tracks.copy()
+        tracks_likes = self.tracks.copy().sort_values('popularity', ascending=False)
         tracks_likes['like'] = self.tracks_full['id'].isin(liked).astype(int) - 5*self.tracks_full['id'].isin(disliked).astype(int)
         
         
@@ -74,5 +74,8 @@ class MLP:
         probs = self.rna.predict_proba(self.tracks)[:, 1]
         tracks_copy = self.tracks_full.copy()
         tracks_copy['like_prob'] = probs
-        recommended_tracks = tracks_copy.sort_values('like_prob', ascending=False)[~tracks_copy['id'].isin(liked)]
+        recommended_tracks = (
+            tracks_copy
+            #.sort_values('popularity', ascending=False).iloc[0:1000]
+            .sort_values('like_prob', ascending=False)[~tracks_copy['id'].isin(liked)])
         return recommended_tracks
