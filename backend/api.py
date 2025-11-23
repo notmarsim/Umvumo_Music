@@ -3,7 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import ast
 from spotify_controller import SpotifyController
-from mlp_controller import MLP
+#from mlp_controller import MLP
+from elm_controller import ELM
 from typing import List, Optional
 
 app = FastAPI()
@@ -23,7 +24,8 @@ app.add_middleware(
 )
 
 spotify = SpotifyController()
-mlp = MLP()
+#mlp = MLP()
+elm = ELM(hidden_neurons=40)
 
 def formatTracks(df: pd.DataFrame):
     df['artist'] = df['artists'].apply(lambda x: ast.literal_eval(x)[0])
@@ -53,7 +55,7 @@ async def getRecommendedTracks(amount:int,liked:Optional[List[str]] = Query(None
     print('DISLIKED:',disliked)
     liked = liked if liked else []
     disliked = disliked if disliked else []
-    df = mlp.run(liked,disliked)[0:amount]
+    df = elm.run(liked,disliked)[0:amount]
     df = formatTracks(df)
     df.index = list(range(amount))
     tracks = [df.iloc[i].to_dict() for i in range(amount)]
