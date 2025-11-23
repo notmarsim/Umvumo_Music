@@ -6,7 +6,7 @@ RODAR BACK-END:
 
 cd .\backend
 
-instalar requerimentos: pip install requirements.txt
+instalar requerimentos: pip install -r requirements.txt
 
 uvicorn api:app --reload
 
