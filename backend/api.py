@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Form, Query
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import ast
@@ -46,10 +46,13 @@ def getTracks(amount:int):
     tracks = [df.iloc[i].to_dict() for i in range(amount)]
     return tracks
 
+
 @app.get('/recommended-tracks/{amount}')
-async def getRecommendedTracks(amount:int,liked:List[str] = Query(...),disliked:List[str] = Query(...)): # MLP
+async def getRecommendedTracks(amount:int,liked:Optional[List[str]] = Query(None),disliked:Optional[List[str]] = Query(None)): # MLP
     print('LIKED:',liked)
     print('DISLIKED:',disliked)
+    liked = liked if liked else []
+    disliked = disliked if disliked else []
     df = mlp.run(liked,disliked)[0:amount]
     df = formatTracks(df)
     df.index = list(range(amount))

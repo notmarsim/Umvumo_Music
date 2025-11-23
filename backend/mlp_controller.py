@@ -20,7 +20,7 @@ class MLP:
 
         features = [
             'valence', 'acousticness', 'danceability', 'duration_ms', 'energy',
-            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity', 'id_genre'
+            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity', 'id_genre', 'id_artist'
         ]
         data = self.tracks_full[features]
 
@@ -38,8 +38,9 @@ class MLP:
     def train(self,liked,disliked):
 
         tracks_likes = self.tracks.copy().sort_values('popularity', ascending=False)
-        tracks_likes['like'] = self.tracks_full['id'].isin(liked).astype(int) - 5*self.tracks_full['id'].isin(disliked).astype(int)
-        
+        tracks_likes['like'] = self.tracks_full['id'].isin(liked).astype(int) - 100*self.tracks_full['id'].isin(disliked).astype(int)
+        tracks_likes['order'] = tracks_likes['like'].apply(lambda x: 1 if x == 0 else 0)
+        tracks_likes = tracks_likes.sort_values('order').drop('order',axis=1)
         
         train_ratio = 0.6
         valid_ratio = 0.2

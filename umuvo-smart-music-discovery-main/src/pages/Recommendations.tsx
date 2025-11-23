@@ -35,8 +35,8 @@ const Recommendations = () => {
       const params = new URLSearchParams();
       console.log(likedSongs)
       console.log(dislikedSongs)
-      likedSongs.forEach(t => params.append("liked", t.id));
-      dislikedSongs.forEach(t => params.append("disliked", t.id))
+      likedSongs?.forEach(t => params.append("liked", t.id));
+      dislikedSongs?.forEach(t => params.append("disliked", t.id))
       request = `http://127.0.0.1:8000/recommended-tracks/20?${params.toString()}`
     }
 
