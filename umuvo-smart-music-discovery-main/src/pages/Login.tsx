@@ -32,7 +32,7 @@ const Login = () => {
               <Music2 className="h-12 w-12 text-primary-foreground" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-foreground">Umuvo</h1>
+          <h1 className="text-4xl font-bold text-foreground">Umvumo</h1>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6">

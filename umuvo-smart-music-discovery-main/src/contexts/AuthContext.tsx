@@ -22,7 +22,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("umuvoUser");
+    const storedUser = localStorage.getItem("umvumoUser");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       preferences: [],
     };
     setUser(mockUser);
-    localStorage.setItem("umuvoUser", JSON.stringify(mockUser));
+    localStorage.setItem("umvumoUser", JSON.stringify(mockUser));
   };
 
   const signup = async (username: string, email: string, password: string, photoUrl?: string) => {
@@ -49,12 +49,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       preferences: [],
     };
     setUser(newUser);
-    localStorage.setItem("umuvoUser", JSON.stringify(newUser));
+    localStorage.setItem("umvumoUser", JSON.stringify(newUser));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("umuvoUser");
+    localStorage.removeItem("umvumoUser");
     localStorage.removeItem("likedSongs");
   };
 
@@ -62,7 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (user) {
       const updatedUser = { ...user, preferences };
       setUser(updatedUser);
-      localStorage.setItem("umuvoUser", JSON.stringify(updatedUser));
+      localStorage.setItem("umvumoUser", JSON.stringify(updatedUser));
     }
   };
 

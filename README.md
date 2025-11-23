@@ -12,7 +12,7 @@ uvicorn api:app --reload
 
 RODAR FRONT-END:
 
-cd .\umuvo-smart-music-discovery-main
+cd .\frontend 
 
 instalar requerimentos: npm i
 

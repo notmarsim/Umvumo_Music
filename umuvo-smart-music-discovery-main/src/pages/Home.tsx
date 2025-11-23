@@ -51,7 +51,7 @@ const Home = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <h1 className="text-xl font-bold">Umuvo</h1>
+          <h1 className="text-xl font-bold">Umvumo</h1>
           <div className="w-10" />
         </div>
 
