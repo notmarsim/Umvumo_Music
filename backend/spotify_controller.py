@@ -44,6 +44,9 @@ class SpotifyController:
 
         r = requests.get(f'https://api.spotify.com/v1/tracks',headers=headers,params=params)
 
+        if r.status_code == 401:
+            self.TOKEN = self.getToken()
+            return self.getCovers()
         if r.status_code != 200:
             print("ERRO NO REQUEST")
             print("Status:", r.status_code)
@@ -54,7 +57,12 @@ class SpotifyController:
         data = r.json()
 
         try:
-            covers = [t['album']['images'][0]['url'] for t in data['tracks']]
+            covers = [
+                t['album']['images'][0]['url'] 
+                if t['album']['images'] != [] else 
+                'https://png.pngtree.com/png-vector/20190820/ourmid/pngtree-no-image-vector-illustration-isolated-png-image_1694547.jpg'
+                for t in data['tracks']
+            ]
         except Exception as e:
             [print(t['album'] ) for t in data['tracks']]
             return

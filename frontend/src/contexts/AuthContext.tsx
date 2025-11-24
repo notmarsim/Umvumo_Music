@@ -56,13 +56,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
     localStorage.removeItem("umvumoUser");
     localStorage.removeItem("likedSongs");
+    localStorage.removeItem("dislikedSongs");
   };
 
   const updatePreferences = (preferences: string[]) => {
     if (user) {
+      console.log(user)
       const updatedUser = { ...user, preferences };
       setUser(updatedUser);
       localStorage.setItem("umvumoUser", JSON.stringify(updatedUser));
+      console.log(updatedUser)
     }
   };
 

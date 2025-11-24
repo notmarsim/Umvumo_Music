@@ -11,21 +11,22 @@ export interface Song {
 export interface Genre {
   id: string;
   name: string;
+  keywords: string[];
 }
 
 export const genres: Genre[] = [
-  { id: "pop", name: "Pop" },
-  { id: "rock", name: "Rock" },
-  { id: "hip-hop", name: "Hip-Hop/Rap" },
-  { id: "eletronica", name: "Eletrônica" },
-  { id: "mpb", name: "MPB" },
-  { id: "sertanejo", name: "Sertanejo" },
-  { id: "funk", name: "Funk" },
-  { id: "indie", name: "Indie" },
-  { id: "jazz", name: "Jazz" },
-  { id: "classica", name: "Clássica" },
-  { id: "reggae", name: "Reggae" },
-  { id: "rnb", name: "R&B" },
+  { id: "pop", name: "Pop", keywords: ['pop','reggaeton'] },
+  { id: "rock", name: "Rock", keywords: ["rock", "metal", "punk", "nwobhm",'black','death','hardcore'] },
+  { id: "hip-hop", name: "Hip-Hop/Rap", keywords: ['hip hop','drill','rap','crunk'] },
+  { id: "eletronica", name: "Eletrônica", keywords: ['edm','step','house','techno','electro','dance','phonk','synth','hardstyle'] },
+  { id: "mpb", name: "MPB", keywords: ['mpb','samba','forro','bossa'] },
+  { id: "sertanejo", name: "Sertanejo", keywords: ['sertanejo','brega'] },
+  { id: "funk", name: "Funk", keywords: ['funk'] },
+  { id: "indie", name: "Indie", keywords: ['indie','bedroom','shoegaze'] },
+  { id: "jazz", name: "Jazz", keywords: ['jazz','blues'] },
+  { id: "classica", name: "Clássica", keywords: ['classical','baroque'] },
+  { id: "folk", name: "Folk", keywords: ['folk','country','bard'] },
+  { id: "rnb", name: "R&B", keywords: ['R&B'] },
 ];
 
 async function getPopTracks(){

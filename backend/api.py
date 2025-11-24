@@ -23,17 +23,17 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+genres = pd.read_csv('csv/data_by_genres.csv')
 spotify = SpotifyController()
 mlp = MLP()
-elm = ELM()
+#elm = ELM()
 
 def formatTracks(df: pd.DataFrame):
     df['artist'] = df['artists'].apply(lambda x: ast.literal_eval(x)[0])
-
     df['coverUrl'] = spotify.getCovers(','.join(df['id'].to_list()))
-    
     df['title'] = df['name']
-    df = df[['id','title','artist','coverUrl']]
+    df['genre'] = df['id_genre'].apply(lambda x: genres.iloc[x]['genres'])
+    df = df[['id','title','artist','coverUrl','genre']]
     return df
 
 @app.get('/')
@@ -42,21 +42,25 @@ def root():
 
 @app.get('/popular-tracks/{amount}')
 def getTracks(amount:int):
-    df = pd.read_csv('csv/data.csv').sort_values(by='popularity',ascending=False).iloc[0:amount]
+    df = pd.read_csv('csv/data_with_genres_id.csv').sort_values(by='popularity',ascending=False).iloc[0:amount]
     df = formatTracks(df)
-    df.index = list(range(amount))
     tracks = [df.iloc[i].to_dict() for i in range(amount)]
     return tracks
 
 
 @app.get('/recommended-tracks/{amount}')
-async def getRecommendedTracks(amount:int,liked:Optional[List[str]] = Query(None),disliked:Optional[List[str]] = Query(None)): # MLP
+async def getRecommendedTracks(
+    amount:int,
+    liked:Optional[List[str]] = Query(None),
+    disliked:Optional[List[str]] = Query(None),
+    preferences:Optional[List[str]] = Query(None)
+): # MLP
     print('LIKED:',liked)
     print('DISLIKED:',disliked)
+    print('PREFS',preferences)
     liked = liked if liked else []
     disliked = disliked if disliked else []
-    df = mlp.run(liked,disliked)[0:amount]
+    df = mlp.run(liked,disliked,preferences)[0:amount]
     df = formatTracks(df)
-    #df.index = list(range(df.count().count()))
     tracks = [df.iloc[i].to_dict() for i in range(amount)]
     return tracks

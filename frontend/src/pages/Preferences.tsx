@@ -18,9 +18,9 @@ const Preferences = () => {
 
   const toggleGenre = (genreId: string) => {
     setSelectedGenres((prev) =>
-      prev.includes(genreId)
-        ? prev.filter((id) => id !== genreId)
-        : [...prev, genreId]
+    prev.includes(genreId)
+      ? prev.filter((id) => id !== genreId)
+      : [...prev, genreId]
     );
   };
 

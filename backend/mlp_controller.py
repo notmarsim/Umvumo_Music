@@ -13,6 +13,7 @@ class MLP:
         self.learning_rates = 0.001
         self.activation = 'tanh'
         self.tracks_full = pd.read_csv("csv/data_with_genres_id.csv")
+        self.genres = pd.read_csv('csv/data_by_genres.csv')
 
     def setTracks(self):
         features = [
@@ -27,10 +28,20 @@ class MLP:
     
     def setTrainData(self,liked,disliked):
         tracks_likes = self.setTracks()
-        tracks_likes['like'] = len(liked)*self.tracks_full['id'].isin(liked).astype(int) - len(disliked)*self.tracks_full['id'].isin(disliked).astype(int)
-        tracks_likes['order'] = tracks_likes['like'].apply(lambda x: 1 if x == 0 else 0)
-        tracks_likes = tracks_likes.sort_values('order').drop('order',axis=1)
-        tracks_likes = tracks_likes[tracks_likes['like'] != 0]
+
+        tracks_likes['like'] = (
+
+            len(liked)*self.tracks_full['id'].isin(liked).astype(int)
+
+            - len(disliked)*self.tracks_full['id'].isin(disliked).astype(int)
+
+        )
+        
+        tracks_likes = tracks_likes[tracks_likes['like'] != 0].sort_values('like',ascending=False)
+
+        # tracks_likes['order'] = tracks_likes['like'].apply(lambda x: 1 if x == 0 else 0)
+        # tracks_likes = tracks_likes.sort_values('order').drop('order',axis=1)
+        
         
         train_ratio = 0.6
         # valid_ratio = 0.2
@@ -46,9 +57,9 @@ class MLP:
 
         return (train_input,train_target)
 
-    def run(self,liked,disliked):
+    def run(self,liked,disliked,preferences):
         self.train(liked,disliked)
-        return self.predict(liked)
+        return self.predict(liked,preferences)
 
     def train(self,liked,disliked):
 
@@ -68,12 +79,14 @@ class MLP:
         self.rna = rna
         
     
-    def predict(self,liked):
-        probs = self.rna.predict_proba(self.setTracks())[:, 1]
+    def predict(self,liked,preferences):
+        tracks = self.setTracks()
+        probs = self.rna.predict_proba(tracks)[:, 1]
         tracks_copy = self.tracks_full.copy()
         tracks_copy['like_prob'] = probs
         recommended_tracks = (
             tracks_copy
-            .sort_values('like_prob', ascending=False)[~tracks_copy['id'].isin(liked)]
+            .sort_values('like_prob', ascending=False)[ ~tracks_copy['id'].isin(liked) ]
         )
+        if preferences: recommended_tracks = recommended_tracks['keyword'].isin(preferences) 
         return recommended_tracks
