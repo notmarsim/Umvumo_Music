@@ -29,7 +29,7 @@ const Recommendations = () => {
 
     console.log(type)
 
-    var request = `http://127.0.0.1:8000/popular-tracks/20`
+    var request = `http://127.0.0.1:8000/popular-tracks/30`
 
     if (type == 'recommended'){
       const params = new URLSearchParams();

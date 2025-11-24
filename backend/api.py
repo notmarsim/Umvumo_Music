@@ -4,6 +4,7 @@ import pandas as pd
 import ast
 from spotify_controller import SpotifyController
 from mlp_controller import MLP
+from elm_controller import ELM
 from typing import List, Optional
 
 app = FastAPI()
@@ -24,6 +25,7 @@ app.add_middleware(
 
 spotify = SpotifyController()
 mlp = MLP()
+elm = ELM()
 
 def formatTracks(df: pd.DataFrame):
     df['artist'] = df['artists'].apply(lambda x: ast.literal_eval(x)[0])
@@ -55,6 +57,6 @@ async def getRecommendedTracks(amount:int,liked:Optional[List[str]] = Query(None
     disliked = disliked if disliked else []
     df = mlp.run(liked,disliked)[0:amount]
     df = formatTracks(df)
-    df.index = list(range(amount))
+    #df.index = list(range(df.count().count()))
     tracks = [df.iloc[i].to_dict() for i in range(amount)]
     return tracks

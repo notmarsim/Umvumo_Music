@@ -53,7 +53,11 @@ class SpotifyController:
 
         data = r.json()
 
-        covers = [t['album']['images'][0]['url'] for t in data['tracks']]
-
+        try:
+            covers = [t['album']['images'][0]['url'] for t in data['tracks']]
+        except Exception as e:
+            [print(t['album'] ) for t in data['tracks']]
+            return
+        
         return covers
 
