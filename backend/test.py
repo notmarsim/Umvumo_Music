@@ -88,14 +88,25 @@ import warnings
 
 df = pd.read_csv('csv/data_with_genres_id.csv')
 
-genres = pd.read_csv('csv/data_by_genres.csv')
+# genres = pd.read_csv('csv/data_by_genres.csv')
 
-def setPrefs(genId):
+# def setPrefs(genId):
     
-    return genres.iloc[genId]['keyword']
+#     return genres.iloc[genId]['keyword']
 
-df['keyword'] = df['id_genre'].apply(setPrefs)
+# df['keyword'] = df['id_genre'].apply(setPrefs)
 
-df.to_csv('csv/data_with_genres_id.csv')
+# df.to_csv('csv/data_with_genres_id.csv')
 
+features = [
+            'valence', 'acousticness', 'danceability', 'duration_ms', 'energy',
+            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity', 'id_genre', 'id_artist'
+        ]
+
+df = df[features]
+
+df_min = df.min()
+df_max = df.max()
+
+print((df - df_min)/(df_max-df_min))
 

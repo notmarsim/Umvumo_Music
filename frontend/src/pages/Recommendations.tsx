@@ -29,7 +29,7 @@ const Recommendations = () => {
 
     console.log(type)
 
-    var request = `http://127.0.0.1:8000/popular-tracks/30`
+    var request = `http://127.0.0.1:8000/popular-tracks/20`
 
     if (type == 'recommended'){
       const params = new URLSearchParams();
@@ -140,6 +140,9 @@ const Recommendations = () => {
               <p className="text-sm text-muted-foreground capitalize">
                 {currentSong.genre}
               </p>
+              <a href={`https://open.spotify.com/intl-pt/track/${currentSong.id}`}>
+                {'Spotify'}
+              </a>
             </div>
           </div>
 
