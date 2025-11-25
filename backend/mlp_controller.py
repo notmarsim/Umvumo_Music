@@ -15,28 +15,32 @@ class MLP:
         self.tracks_full = pd.read_csv("csv/data_with_genres_id.csv")
         self.genres = pd.read_csv('csv/data_by_genres.csv')
 
-    def setTracks(self):
-        features = [
-            'valence', 'acousticness', 'danceability', 'duration_ms', 'energy',
-            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity', 'id_genre', 'id_artist'
-        ]
-        df = self.tracks_full[features]
-        tracks = (df - df.min())/(df.max()-df.min())
-        return tracks
-    
     # def setTracks(self):
     #     features = [
     #         'valence', 'acousticness', 'danceability', 'duration_ms', 'energy',
     #         'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity', 'id_genre', 'id_artist'
     #     ]
-    #     data = self.tracks_full[features]
-    #     scaler = StandardScaler()
-    #     data_scaled = scaler.fit_transform(data)
-    #     tracks = pd.DataFrame(data_scaled, columns=features)
+    #     df = self.tracks_full[features]
+    #     tracks = (df - df.min())/(df.max()-df.min())
     #     return tracks
+    
+    def setTracks(self):
+        features = [
+            'valence', 'acousticness', 'danceability', 'duration_ms', 'energy',
+            'instrumentalness', 'liveness', 'loudness', 'speechiness', 'popularity', 'id_genre', 'id_artist'
+        ]
+        data = self.tracks_full[features]
+        scaler = StandardScaler()
+        data_scaled = scaler.fit_transform(data)
+        tracks = pd.DataFrame(data_scaled, columns=features)
+        return tracks
     
     def setTrainData(self,liked,disliked):
         tracks_likes = self.setTracks()
+        prefs = self.setTracks()
+        prefs['keyword'] = self.tracks_full['keyword']
+
+
         tracks_likes['like'] = (
             len(liked)*self.tracks_full['id'].isin(liked).astype(int)
             - 100*len(disliked)*self.tracks_full['id'].isin(disliked).astype(int)
@@ -88,9 +92,15 @@ class MLP:
         probs = self.rna.predict_proba(tracks)[:, 1]
         tracks_copy = self.tracks_full.copy()
         tracks_copy['like_prob'] = probs
-        recommended_tracks = (
-            tracks_copy
-            .sort_values('like_prob', ascending=False)[ ~tracks_copy['id'].isin(liked+disliked) ]
-        )
-        if preferences: recommended_tracks = recommended_tracks[recommended_tracks['keyword'].isin(preferences)] 
+        recommended_tracks = tracks_copy[~tracks_copy['id'].isin(liked+disliked)]
+        
+        if preferences: 
+            recommended_tracks['genre_pref'] = recommended_tracks['keyword'].isin(preferences).astype(int)
+            BOOST = 0.05
+            recommended_tracks['final_score'] = recommended_tracks['like_prob'] + BOOST * recommended_tracks['genre_pref']
+        else:
+            recommended_tracks['final_score'] = recommended_tracks['like_prob']
+
+        recommended_tracks = recommended_tracks.sort_values('final_score', ascending=False)
         return recommended_tracks
+
